@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "nextjs-cloudflare-voice-ai",
+	"name": "worker",
 	"main": "./.open-next/worker.js",
 	"compatibility_date": "2025-08-13",
 	"compatibility_flags": [
