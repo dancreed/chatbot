@@ -1,15 +1,17 @@
-// VoiceTextChat.tsx
 import React, { useState, useRef } from "react";
 
 export default function VoiceTextChat() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<{text: string; sender: "user"|"ai"}[]>([]);
+  const [messages, setMessages] = useState<{ text: string; sender: "user" | "ai" }[]>([]);
   const [listening, setListening] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Start browser speech recognition
   const startListening = () => {
-    if (!('webkitSpeechRecognition' in window)) return alert("Speech recognition not supported!");
+    if (!('webkitSpeechRecognition' in window)) {
+      alert("Speech recognition not supported!");
+      return;
+    }
     const recognition = new window.webkitSpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
@@ -17,7 +19,7 @@ export default function VoiceTextChat() {
     recognition.onstart = () => setListening(true);
     recognition.onend = () => setListening(false);
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const speech = event.results?.?.?.transcript;
+      const speech = event.results?.[0]?.[0]?.transcript;
       if (speech) handleSend(speech);
     };
     recognition.start();
@@ -38,7 +40,9 @@ export default function VoiceTextChat() {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center">
-      <header className="py-8 text-4xl font-bold text-center tracking-tight">AI Chatbot</header>
+      <header className="py-8 text-4xl font-bold text-center tracking-tight">
+        AI Chatbot
+      </header>
       <main className="flex-1 w-full max-w-2xl flex flex-col items-center">
         <div className="chat-window w-full bg-white text-black p-6 rounded-lg mb-6 shadow-lg max-h-[60vh] overflow-y-auto">
           {messages.map((m, i) => (
@@ -68,15 +72,17 @@ export default function VoiceTextChat() {
             className="bg-white text-black rounded-full px-4 py-3 font-bold hover:bg-gray-200 transition-shadow"
             onClick={() => handleSend()}
             aria-label="Send message"
-          >Send</button>
+          >
+            Send
+          </button>
           <button
             className={`bg-white rounded-full p-3 ml-2 ${listening ? "animate-pulse bg-yellow-300" : ""}`}
             onClick={() => !listening && startListening()}
             aria-label="Start speech input"
           >
             <svg width="24" height="24" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <rect x="9" y="8" width="6" height="8" rx="3"/>
+              <circle cx="12" cy="12" r="10" />
+              <rect x="9" y="8" width="6" height="8" rx="3" />
             </svg>
           </button>
         </div>
