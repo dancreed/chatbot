@@ -2141,10 +2141,25 @@
     "@ricky0123/vad-web" "0.0.24"
     onnxruntime-web "1.14.0"
 
+"@ricky0123/vad-react@^0.0.32":
+  version "0.0.32"
+  resolved "https://registry.yarnpkg.com/@ricky0123/vad-react/-/vad-react-0.0.32.tgz#bf06acee91f86b3c0ebc6be4cb1b59b1e9d1c6a9"
+  integrity sha512-PgAQtZz8gH51FHah699JlCx7IfLsgIveG/HdP/Hewjb1BCfUODXJ8JCHU+7VxLLiCbJs0uGTRNuEdUKs8ub61w==
+  dependencies:
+    "@ricky0123/vad-web" "0.0.26"
+    onnxruntime-web "1.14.0"
+
 "@ricky0123/vad-web@0.0.24":
   version "0.0.24"
   resolved "https://registry.yarnpkg.com/@ricky0123/vad-web/-/vad-web-0.0.24.tgz#e65053bce876b9fa778a5176216809420a0fedde"
   integrity sha512-uv6GWW/kq8BkVErMQzXp3uwSyYMT3w/3QJiUerVaaKp7EwhOTIRY+96EoyFdG2WOFU5RkLk/2CVGbI7nDlxhEg==
+  dependencies:
+    onnxruntime-web "1.14.0"
+
+"@ricky0123/vad-web@0.0.26":
+  version "0.0.26"
+  resolved "https://registry.yarnpkg.com/@ricky0123/vad-web/-/vad-web-0.0.26.tgz#781957e2ba6a9f56fc1512bb0f72ed412b2333a7"
+  integrity sha512-LqggJVvIT+b211ZE96ErgaHJwzfm9jxROldDehlbDxi1uNJf4e7dwYugM228NHjmw5Bnsw6XH9WNc9rR9/kZbA==
   dependencies:
     onnxruntime-web "1.14.0"
 
