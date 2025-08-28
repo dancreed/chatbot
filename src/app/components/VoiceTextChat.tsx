@@ -1,33 +1,31 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-
-// Add minimal type declarations for compatibility
-type SpeechRecognitionType = typeof window.webkitSpeechRecognition;
-type SpeechRecognitionEventType = any;
+// Import types from the dom-speech-recognition package
+import type { SpeechRecognition, SpeechRecognitionEvent } from "dom-speech-recognition";
 
 export default function VoiceTextChat() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ text: string; sender: "user" | "ai" }[]>([]);
   const [listening, setListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Start browser speech recognition
   const startListening = () => {
-    const SpeechRecognition: SpeechRecognitionType =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
+    const SpeechRecognitionClass =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognitionClass) {
       alert("Speech recognition not supported!");
       return;
     }
-    const recognition = new SpeechRecognition();
+    const recognition: SpeechRecognition = new SpeechRecognitionClass();
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = "en-US";
     recognition.onstart = () => setListening(true);
     recognition.onend = () => setListening(false);
-    recognition.onresult = (event: SpeechRecognitionEventType) => {
-      const speech = event.results?.[0]?.[0]?.transcript;
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const speech = event.results?.?.?.transcript;
       if (speech) handleSend(speech);
     };
     recognition.start();
