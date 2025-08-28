@@ -2,7 +2,6 @@ import { smoothStream, streamText, type CoreMessage } from 'ai';
 import { DurableObject } from 'cloudflare:workers';
 import { createWorkersAI } from 'workers-ai-provider';
 import PQueue from 'p-queue';
-export { MyDurableObject } from "./.build/durable-objects/my-durable-object.js";
 
 /* Todo
  * ✅ 1. WS with frontend
