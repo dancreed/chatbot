@@ -1,25 +1,32 @@
-"use client"
+"use client";
+
 import React, { useState, useRef } from "react";
+
+// Add minimal type declarations for compatibility
+type SpeechRecognitionType = typeof window.webkitSpeechRecognition;
+type SpeechRecognitionEventType = any;
 
 export default function VoiceTextChat() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ text: string; sender: "user" | "ai" }[]>([]);
   const [listening, setListening] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   // Start browser speech recognition
   const startListening = () => {
-    if (!('webkitSpeechRecognition' in window)) {
+    const SpeechRecognition: SpeechRecognitionType =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
       alert("Speech recognition not supported!");
       return;
     }
-    const recognition = new window.webkitSpeechRecognition();
+    const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = "en-US";
     recognition.onstart = () => setListening(true);
     recognition.onend = () => setListening(false);
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: SpeechRecognitionEventType) => {
       const speech = event.results?.[0]?.[0]?.transcript;
       if (speech) handleSend(speech);
     };
@@ -35,7 +42,7 @@ export default function VoiceTextChat() {
     setInput("");
     // Simulate AI response
     setTimeout(() => {
-      setMessages(msgs => [...msgs, { text: `AI: ${message}`, sender: "ai" }]);
+      setMessages((msgs) => [...msgs, { text: `AI: ${message}`, sender: "ai" }]);
     }, 800);
   };
 
@@ -65,8 +72,8 @@ export default function VoiceTextChat() {
             type="text"
             value={input}
             placeholder="Type your message..."
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleSend()}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
             aria-label="Chat message"
           />
           <button
