@@ -1,4 +1,7 @@
 import VoiceChat from "@/app/components/VoiceChat";
+import VoiceTextChat from './components/VoiceTextChat';
+// ...
+<VoiceTextChat />
 
 export default function Page() {
   return (
