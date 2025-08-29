@@ -1,4 +1,5 @@
 "use client";
+console.log("VoiceTextChat component is rendering!");
 import React, { useState, useRef } from "react";
 
 // Minimal in-file type declarations
