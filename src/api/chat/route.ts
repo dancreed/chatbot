@@ -1,4 +1,6 @@
 import { NextRequest } from "next/server";
+console.log("AI_ENDPOINT:", AI_ENDPOINT);
+console.log("CLOUDFLARE_API_TOKEN:", process.env.CLOUDFLARE_API_TOKEN);
 
 // Replace with your actual Cloudflare AI endpoint and account/model!
 const AI_ENDPOINT = "https://api.cloudflare.com/client/v4/accounts/1443bf3700478d04e685484953259e23/ai/run/@cf/meta/llama-2-7b-chat-fp16";
