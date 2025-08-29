@@ -1,6 +1,4 @@
 "use client";
-<<<<<<< HEAD
-console.log("VoiceTextChat component is rendering!");
 import React, { useState, useRef } from "react";
 
 // Minimal in-file type declarations
@@ -143,16 +141,6 @@ export default function VoiceTextChat() {
           </button>
         </div>
       </div>
-=======
-export default function VoiceTextChat() {
-  return (
-    <div style={{ background: "black", minHeight: "100vh", padding: 40 }}>
-      <input
-        style={{ width: 300, height: 40, fontSize: 20, background: "lime", border: "2px solid red" }}
-        placeholder="SHOULD BE VISIBLE"
-      />
-      <button>Send</button>
->>>>>>> 2fd2cd5ed5c3e760239113d8c0a9c3eef3603b61
     </div>
   );
 }
