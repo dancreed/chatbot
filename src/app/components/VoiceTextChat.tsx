@@ -28,7 +28,7 @@ export default function VoiceTextChat() {
     recognitionRef.current = recognition;
   };
 
-  // Updated handleSend for full error visibility:
+  // Defensive handleSend: Always render a string!
   const handleSend = async (txt?: string) => {
     const message = txt ?? input;
     if (!message.trim()) return;
@@ -43,13 +43,22 @@ export default function VoiceTextChat() {
         body: JSON.stringify({ message }),
       });
 
-      const data = await res.json() as { response: string };
-      // Display the full backend response—AI answer or error!
-      setMessages((msgs) => [...msgs, { text: data.response, sender: "ai" }]);
+      const data = await res.json() as { response: unknown };
+      const messageText =
+        typeof data.response === "string"
+          ? data.response
+          : JSON.stringify(data.response);
+
+      setMessages((msgs) => [...msgs, { text: messageText, sender: "ai" }]);
     } catch (err) {
       setMessages((msgs) => [
         ...msgs,
-        { text: `Client error: ${err instanceof Error ? err.message : String(err)}`, sender: "ai" }
+        {
+          text: `Client error: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+          sender: "ai",
+        },
       ]);
     }
   };
