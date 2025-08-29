@@ -1,5 +1,9 @@
-import VoiceTextChat from "./components/VoiceTextChat";
+import VoiceChat from "./components/VoiceChat";
 
-export default function Page() {
-  return <VoiceTextChat />;
+export default function HomePage() {
+  return (
+    <main>
+      <VoiceChat />
+    </main>
+  );
 }
