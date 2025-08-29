@@ -28,7 +28,7 @@ export default function VoiceTextChat() {
     recognitionRef.current = recognition;
   };
 
-  // --- Updated handleSend: makes request to AI backend and shows AI reply ---
+  // Async handler for sending messages and processing AI responses:
   const handleSend = async (txt?: string) => {
     const message = txt ?? input;
     if (!message.trim()) return;
@@ -37,16 +37,16 @@ export default function VoiceTextChat() {
     setInput("");
 
     try {
-      // Call your Next.js API backend (which calls Cloudflare AI)
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message }),
       });
 
-      const data = await res.json();
+      // --- Type assertion fix here ---
+      const data = await res.json() as { response: string };
       setMessages((msgs) => [...msgs, { text: data.response, sender: "ai" }]);
-    } catch (err) {
+    } catch {
       setMessages((msgs) => [
         ...msgs,
         { text: "Error: Unable to reach AI backend.", sender: "ai" }
