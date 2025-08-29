@@ -64,10 +64,11 @@ export default function VoiceVisualStatus({
       // Choose context: parent-provided (preferred) or create a local one.
       const AC =
         typeof window !== "undefined" &&
-        ((window.AudioContext) || ((window as any).webkitAudioContext));
+        (window.AudioContext || window.webkitAudioContext);
       if (!AC) return;
 
       const ac = audioContext ?? new AC();
+
 
       acRef.current = ac;
 
