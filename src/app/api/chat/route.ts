@@ -34,10 +34,13 @@ export async function POST(req: NextRequest) {
     const contentType = aiRes.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       const responsePayload = await aiRes.json() as Record<string, unknown>;
-      // Log to server for debug
-      console.log("[AI ROUTE] Raw Cloudflare response:", JSON.stringify(responsePayload));
-      // Return full JSON for easy inspection in frontend
-      return Response.json({ response: JSON.stringify(responsePayload, null, 2) });
+      // Extract text from result.response
+      const text =
+        responsePayload.result &&
+        typeof (responsePayload.result as Record<string, unknown>).response === "string"
+          ? (responsePayload.result as Record<string, unknown>).response
+          : "(No AI response)";
+      return Response.json({ response: text });
     } else {
       const errorText = await aiRes.text();
       return Response.json({
@@ -50,3 +53,4 @@ export async function POST(req: NextRequest) {
     });
   }
 }
+
