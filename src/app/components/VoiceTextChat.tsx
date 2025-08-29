@@ -1,8 +1,31 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-// Import types from the dom-speech-recognition package
-import type { SpeechRecognition, SpeechRecognitionEvent } from "dom-speech-recognition";
+
+// Minimal in-file type declarations
+interface SpeechRecognitionResultItem {
+  transcript: string;
+  confidence: number;
+}
+interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionResultItem;
+  length: number;
+}
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResult[];
+}
+type SpeechRecognitionConstructor = new () => SpeechRecognition;
+interface SpeechRecognition extends EventTarget {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onstart: (() => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
 
 export default function VoiceTextChat() {
   const [input, setInput] = useState("");
@@ -10,15 +33,15 @@ export default function VoiceTextChat() {
   const [listening, setListening] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
-  // Start browser speech recognition
   const startListening = () => {
-    const SpeechRecognitionClass =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognitionClass: SpeechRecognitionConstructor = 
+      (window as unknown as { SpeechRecognition?: SpeechRecognitionConstructor, webkitSpeechRecognition?: SpeechRecognitionConstructor }).SpeechRecognition ||
+      (window as unknown as { SpeechRecognition?: SpeechRecognitionConstructor, webkitSpeechRecognition?: SpeechRecognitionConstructor }).webkitSpeechRecognition!;
     if (!SpeechRecognitionClass) {
       alert("Speech recognition not supported!");
       return;
     }
-    const recognition: SpeechRecognition = new SpeechRecognitionClass();
+    const recognition = new SpeechRecognitionClass();
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = "en-US";
@@ -32,13 +55,11 @@ export default function VoiceTextChat() {
     recognitionRef.current = recognition;
   };
 
-  // Send message from either text input or speech
   const handleSend = (txt?: string) => {
     const message = txt ?? input;
     if (!message.trim()) return;
     setMessages([...messages, { text: message, sender: "user" }]);
     setInput("");
-    // Simulate AI response
     setTimeout(() => {
       setMessages((msgs) => [...msgs, { text: `AI: ${message}`, sender: "ai" }]);
     }, 800);
