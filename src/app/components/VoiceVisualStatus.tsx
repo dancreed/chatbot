@@ -64,10 +64,11 @@ export default function VoiceVisualStatus({
       // Choose context: parent-provided (preferred) or create a local one.
       const AC =
         typeof window !== "undefined" &&
-        (window.AudioContext || window.webkitAudioContext);
+        ((window.AudioContext) || ((window as any).webkitAudioContext));
       if (!AC) return;
 
       const ac = audioContext ?? new AC();
+
       acRef.current = ac;
 
       // If this context was created before a gesture, it may be suspended; try to resume. (Must be called post-gesture.)
