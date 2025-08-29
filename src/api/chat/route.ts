@@ -34,13 +34,13 @@ export async function POST(req: NextRequest) {
     });
 
     const contentType = aiRes.headers.get('content-type');
-    let responsePayload: any;
+    let responsePayload: Record<string, unknown> | string;
     if (contentType && contentType.includes('application/json')) {
-      responsePayload = await aiRes.json();
+      responsePayload = await aiRes.json() as Record<string, unknown>;
     } else {
       responsePayload = await aiRes.text();
       console.error("[Cloudflare AI Error] HTML/text response:", responsePayload);
-      return Response.json({ response: `AI error: ${aiRes.status} ${responsePayload.slice(0, 300)}` });
+      return Response.json({ response: `AI error: ${aiRes.status} ${(responsePayload as string).slice(0, 300)}` });
     }
 
     if (!aiRes.ok) {
@@ -49,7 +49,10 @@ export async function POST(req: NextRequest) {
     }
 
     console.log("[AI ROUTE] AI response data:", responsePayload);
-    const aiMessage = responsePayload.result ?? responsePayload.response ?? "(No AI response)";
+    const aiMessage =
+      typeof responsePayload === "object"
+        ? (responsePayload.result ?? responsePayload.response ?? "(No AI response)")
+        : "(No AI response)";
     return Response.json({ response: aiMessage });
   } catch (err) {
     console.error("[AI Proxy Error]", err);
