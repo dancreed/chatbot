@@ -22,14 +22,20 @@
       "@/*": ["./src/*"]
     },
     "types": [
-        "./cloudflare-env.d.ts",
-        "node"
+      "./cloudflare-env.d.ts",
+      "node"
     ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "worker/**"]
-}
-{
-  "include": ["src", "global.d.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src",
+    "global.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "worker/**"
+  ]
 }
