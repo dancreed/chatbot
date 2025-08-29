@@ -1,3 +1,5 @@
+import VoiceTextChat from './components/VoiceTextChat';
+
 export default function Page() {
   return (
     <main className="min-h-dvh bg-gray-50 text-gray-900">
