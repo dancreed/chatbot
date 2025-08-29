@@ -15,7 +15,7 @@ export default function VoiceChat() {
 
   // Connect to backend Durable Object WebSocket
   function connectWS() {
-    wsRef.current = new WebSocket("wss://your-worker-endpoint/websocket"); // <-- Replace with your endpoint!
+    wsRef.current = new WebSocket("wss://worker.dan-creed.workers.dev/websocket"); // <-- Replace with your endpoint!
     wsRef.current.onopen = () => {
       setConnected(true);
       setMessages((msgs) => [...msgs, { text: "Connected!", sender: "system" }]);
