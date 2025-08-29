@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useRef } from "react";
-// ... keep your SpeechRecognition interfaces
 
 export default function VoiceTextChat() {
   const [input, setInput] = useState("");
@@ -21,7 +20,7 @@ export default function VoiceTextChat() {
     recognition.lang = "en-US";
     recognition.onstart = () => setListening(true);
     recognition.onend = () => setListening(false);
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       const speech = event.results?.[0]?.[0]?.transcript;
       if (speech) handleSend(speech);
     };
@@ -63,9 +62,7 @@ export default function VoiceTextChat() {
         </div>
       </main>
       {/* Fixed input bar at the bottom */}
-      <div
-        className="w-full bg-white border-t-2 border-gray-300 fixed left-0 right-0 bottom-0 z-50 flex justify-center py-5"
-      >
+      <div className="w-full bg-white border-t-2 border-gray-300 fixed left-0 right-0 bottom-0 z-50 flex justify-center py-5">
         <div className="flex w-full max-w-2xl gap-2 px-4">
           <input
             className="flex-1 bg-gray-50 text-gray-900 border border-gray-400 rounded-full px-6 py-3 text-lg"
