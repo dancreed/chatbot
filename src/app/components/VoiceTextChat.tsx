@@ -1,30 +1,6 @@
 "use client";
 import React, { useState, useRef } from "react";
-
-// Minimal in-file type declarations
-interface SpeechRecognitionResultItem {
-  transcript: string;
-  confidence: number;
-}
-interface SpeechRecognitionResult {
-  [index: number]: SpeechRecognitionResultItem;
-  length: number;
-}
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResult[];
-}
-type SpeechRecognitionConstructor = new () => SpeechRecognition;
-interface SpeechRecognition extends EventTarget {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onstart: (() => void) | null;
-  onend: (() => void) | null;
-  start(): void;
-  stop(): void;
-  abort(): void;
-}
+// ... keep your SpeechRecognition interfaces
 
 export default function VoiceTextChat() {
   const [input, setInput] = useState("");
@@ -33,9 +9,8 @@ export default function VoiceTextChat() {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   const startListening = () => {
-    const SpeechRecognitionClass: SpeechRecognitionConstructor = 
-      (window as unknown as { SpeechRecognition?: SpeechRecognitionConstructor, webkitSpeechRecognition?: SpeechRecognitionConstructor }).SpeechRecognition ||
-      (window as unknown as { SpeechRecognition?: SpeechRecognitionConstructor, webkitSpeechRecognition?: SpeechRecognitionConstructor }).webkitSpeechRecognition!;
+    const SpeechRecognitionClass =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognitionClass) {
       alert("Speech recognition not supported!");
       return;
@@ -46,7 +21,7 @@ export default function VoiceTextChat() {
     recognition.lang = "en-US";
     recognition.onstart = () => setListening(true);
     recognition.onend = () => setListening(false);
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event) => {
       const speech = event.results?.[0]?.[0]?.transcript;
       if (speech) handleSend(speech);
     };
@@ -65,7 +40,7 @@ export default function VoiceTextChat() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
       <header className="py-8 text-4xl font-bold text-center tracking-tight">
         AI Chatbot
       </header>
@@ -73,7 +48,9 @@ export default function VoiceTextChat() {
         <div className="chat-window w-full bg-white text-black p-6 rounded-lg mb-6 shadow-lg max-h-[40vh] overflow-y-auto">
           {messages.map((m, i) => (
             <div key={i} className={`mb-4 ${m.sender === "user" ? "text-right" : "text-left"}`}>
-              <span className={`inline-block px-4 py-2 rounded-xl ${m.sender === "user" ? "bg-black text-white" : "bg-gray-200 text-black"}`}>
+              <span className={`inline-block px-4 py-2 rounded-xl ${
+                m.sender === "user" ? "bg-blue-600 text-white" : "bg-gray-200 text-black"
+              }`}>
                 {m.text}
               </span>
             </div>
@@ -87,24 +64,11 @@ export default function VoiceTextChat() {
       </main>
       {/* Fixed input bar at the bottom */}
       <div
-        className="w-full"
-        style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 1000,
-          background: "#222",
-          padding: "20px 0 16px 0",
-          borderTop: "2px solid #444",
-          display: "flex",
-          justifyContent: "center",
-        }}
+        className="w-full bg-white border-t-2 border-gray-300 fixed left-0 right-0 bottom-0 z-50 flex justify-center py-5"
       >
         <div className="flex w-full max-w-2xl gap-2 px-4">
           <input
-            style={{ background: "white", color: "black", padding: "12px", borderRadius: "99px", fontSize: 20, border: "1.5px solid #aaa" }}
-            className="flex-1"
+            className="flex-1 bg-gray-50 text-gray-900 border border-gray-400 rounded-full px-6 py-3 text-lg"
             type="text"
             value={input}
             placeholder="Type your message..."
@@ -113,28 +77,20 @@ export default function VoiceTextChat() {
             aria-label="Chat message"
           />
           <button
-            style={{ background: "limegreen", color: "black", fontWeight: "bold", borderRadius: "999px", padding: "0 20px", fontSize: 18 }}
+            className="bg-blue-600 text-white font-bold rounded-full px-7 py-3 text-lg"
             onClick={() => handleSend()}
             aria-label="Send message"
           >
             Send
           </button>
           <button
-            style={{
-              background: listening ? "orange" : "white",
-              borderRadius: "999px",
-              border: "2px solid green",
-              marginLeft: "8px",
-              width: "48px",
-              height: "48px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            className={`rounded-full border-2 ml-2 w-12 h-12 flex items-center justify-center ${
+              listening ? "bg-orange-400 border-orange-600" : "bg-gray-200 border-blue-600"
+            }`}
             onClick={() => !listening && startListening()}
             aria-label="Start speech input"
           >
-            <svg width="24" height="24" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="24" height="24" fill="none" stroke={listening ? "white" : "black"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <rect x="9" y="8" width="6" height="8" rx="3" />
             </svg>
