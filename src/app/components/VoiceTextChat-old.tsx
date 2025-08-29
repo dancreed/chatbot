@@ -1,6 +1,5 @@
 "use client";
-<<<<<<< HEAD
-console.log("VoiceTextChat component is rendering!");
+
 import React, { useState, useRef } from "react";
 
 // Minimal in-file type declarations
@@ -59,7 +58,7 @@ export default function VoiceTextChat() {
   const handleSend = (txt?: string) => {
     const message = txt ?? input;
     if (!message.trim()) return;
-    setMessages((msgs) => [...msgs, { text: message, sender: "user" }]);
+    setMessages([...messages, { text: message, sender: "user" }]);
     setInput("");
     setTimeout(() => {
       setMessages((msgs) => [...msgs, { text: `AI: ${message}`, sender: "ai" }]);
@@ -67,12 +66,12 @@ export default function VoiceTextChat() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div className="min-h-screen bg-black text-white flex flex-col items-center">
       <header className="py-8 text-4xl font-bold text-center tracking-tight">
         AI Chatbot
       </header>
-      <main className="flex-1 w-full max-w-2xl mx-auto flex flex-col items-center justify-end pt-4 pb-32">
-        <div className="chat-window w-full bg-white text-black p-6 rounded-lg mb-6 shadow-lg max-h-[40vh] overflow-y-auto">
+      <main className="flex-1 w-full max-w-2xl flex flex-col items-center">
+        <div className="chat-window w-full bg-white text-black p-6 rounded-lg mb-6 shadow-lg max-h-[60vh] overflow-y-auto">
           {messages.map((m, i) => (
             <div key={i} className={`mb-4 ${m.sender === "user" ? "text-right" : "text-left"}`}>
               <span className={`inline-block px-4 py-2 rounded-xl ${m.sender === "user" ? "bg-black text-white" : "bg-gray-200 text-black"}`}>
@@ -86,27 +85,9 @@ export default function VoiceTextChat() {
             </div>
           )}
         </div>
-      </main>
-      {/* Fixed input bar at the bottom */}
-      <div
-        className="w-full"
-        style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 1000,
-          background: "#222",
-          padding: "20px 0 16px 0",
-          borderTop: "2px solid #444",
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <div className="flex w-full max-w-2xl gap-2 px-4">
+        <div className="input-area flex w-full gap-2 max-w-2xl">
           <input
-            style={{ background: "white", color: "black", padding: "12px", borderRadius: "99px", fontSize: 20, border: "1.5px solid #aaa" }}
-            className="flex-1"
+            className="flex-1 bg-white text-black rounded-full px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500 text-lg"
             type="text"
             value={input}
             placeholder="Type your message..."
@@ -115,24 +96,14 @@ export default function VoiceTextChat() {
             aria-label="Chat message"
           />
           <button
-            style={{ background: "limegreen", color: "black", fontWeight: "bold", borderRadius: "999px", padding: "0 20px", fontSize: 18 }}
+            className="bg-white text-black rounded-full px-4 py-3 font-bold hover:bg-gray-200 transition-shadow"
             onClick={() => handleSend()}
             aria-label="Send message"
           >
             Send
           </button>
           <button
-            style={{
-              background: listening ? "orange" : "white",
-              borderRadius: "999px",
-              border: "2px solid green",
-              marginLeft: "8px",
-              width: "48px",
-              height: "48px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            className={`bg-white rounded-full p-3 ml-2 ${listening ? "animate-pulse bg-yellow-300" : ""}`}
             onClick={() => !listening && startListening()}
             aria-label="Start speech input"
           >
@@ -142,17 +113,7 @@ export default function VoiceTextChat() {
             </svg>
           </button>
         </div>
-      </div>
-=======
-export default function VoiceTextChat() {
-  return (
-    <div style={{ background: "black", minHeight: "100vh", padding: 40 }}>
-      <input
-        style={{ width: 300, height: 40, fontSize: 20, background: "lime", border: "2px solid red" }}
-        placeholder="SHOULD BE VISIBLE"
-      />
-      <button>Send</button>
->>>>>>> 2fd2cd5ed5c3e760239113d8c0a9c3eef3603b61
+      </main>
     </div>
   );
 }
