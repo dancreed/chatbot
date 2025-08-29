@@ -37,23 +37,21 @@ export async function POST(req: NextRequest) {
     let responsePayload: Record<string, unknown> | string;
     if (contentType && contentType.includes('application/json')) {
       responsePayload = await aiRes.json() as Record<string, unknown>;
+      if (!aiRes.ok) {
+        console.error("[Cloudflare AI Error]", aiRes.status, responsePayload);
+        return Response.json({ response: `AI error: ${aiRes.status} ${JSON.stringify(responsePayload).slice(0, 300)}` });
+      }
+      const aiMessage =
+        responsePayload.result ??
+        responsePayload.response ??
+        "(No AI response)";
+      return Response.json({ response: aiMessage });
     } else {
-      responsePayload = await aiRes.text();
-      console.error("[Cloudflare AI Error] HTML/text response:", responsePayload);
-      return Response.json({ response: `AI error: ${aiRes.status} ${(responsePayload as string).slice(0, 300)}` });
+      // Always return JSON, even if AI endpoint gave us HTML error
+      const errorText = await aiRes.text();
+      console.error("[Cloudflare AI Error] Non-JSON response:", aiRes.status, errorText.slice(0, 300));
+      return Response.json({ response: `AI error: ${aiRes.status} [Non-JSON]: ${errorText.slice(0, 300)}` });
     }
-
-    if (!aiRes.ok) {
-      console.error("[Cloudflare AI Error]", aiRes.status, responsePayload);
-      return Response.json({ response: `AI error: ${aiRes.status} ${JSON.stringify(responsePayload).slice(0, 300)}` });
-    }
-
-    console.log("[AI ROUTE] AI response data:", responsePayload);
-    const aiMessage =
-      typeof responsePayload === "object"
-        ? (responsePayload.result ?? responsePayload.response ?? "(No AI response)")
-        : "(No AI response)";
-    return Response.json({ response: aiMessage });
   } catch (err) {
     console.error("[AI Proxy Error]", err);
     return Response.json({
