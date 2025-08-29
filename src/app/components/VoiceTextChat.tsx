@@ -25,7 +25,7 @@ export default function VoiceTextChat() {
     recognition.onstart = () => setListening(true);
     recognition.onend = () => setListening(false);
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const speech = event.results?.?.?.transcript;
+      const speech = event.results?.[0]?.[0]?.transcript;
       if (speech) handleSend(speech);
     };
     recognition.start();
