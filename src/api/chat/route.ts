@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 
 // Update these with your Cloudflare AI model and endpoint!
-const AI_ENDPOINT = "https://api.cloudflare.com/client/v4/accounts/YOUR_ACCOUNT_ID/ai/run/@cf/meta/llama-2-7b-chat-fp16"; // Example endpoint
+const AI_ENDPOINT = "https://api.cloudflare.com/client/v4/accounts/1443bf3700478d04e685484953259e23/ai/run/@cf/meta/llama-2-7b-chat-fp16"; // Example endpoint
 
 export async function POST(req: NextRequest) {
   const { message } = await req.json();
