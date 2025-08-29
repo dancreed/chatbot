@@ -33,18 +33,25 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    if (!aiRes.ok) {
-      const errorText = await aiRes.text();
-      console.error("[Cloudflare AI Error]", aiRes.status, errorText);
-      return Response.json({ response: `AI error: ${aiRes.status} ${errorText}` });
+    const contentType = aiRes.headers.get('content-type');
+    let responsePayload: any;
+    if (contentType && contentType.includes('application/json')) {
+      responsePayload = await aiRes.json();
+    } else {
+      responsePayload = await aiRes.text();
+      console.error("[Cloudflare AI Error] HTML/text response:", responsePayload);
+      return Response.json({ response: `AI error: ${aiRes.status} ${responsePayload.slice(0, 300)}` });
     }
 
-    const aiData = await aiRes.json() as { result?: string; response?: string };
-    console.log("[AI ROUTE] AI response data:", aiData);
-    const aiMessage = aiData.result ?? aiData.response ?? "(No AI response)";
+    if (!aiRes.ok) {
+      console.error("[Cloudflare AI Error]", aiRes.status, responsePayload);
+      return Response.json({ response: `AI error: ${aiRes.status} ${JSON.stringify(responsePayload).slice(0, 300)}` });
+    }
+
+    console.log("[AI ROUTE] AI response data:", responsePayload);
+    const aiMessage = responsePayload.result ?? responsePayload.response ?? "(No AI response)";
     return Response.json({ response: aiMessage });
   } catch (err) {
-    // Return full error string to the UI for diagnosis
     console.error("[AI Proxy Error]", err);
     return Response.json({
       response: `AI fetch error: ${err instanceof Error ? err.message : String(err)}`
