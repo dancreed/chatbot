@@ -28,7 +28,7 @@ export default function VoiceTextChat() {
     recognitionRef.current = recognition;
   };
 
-  // Async handler for sending messages and processing AI responses:
+  // Updated handleSend for full error visibility:
   const handleSend = async (txt?: string) => {
     const message = txt ?? input;
     if (!message.trim()) return;
@@ -43,13 +43,13 @@ export default function VoiceTextChat() {
         body: JSON.stringify({ message }),
       });
 
-      // --- Type assertion fix here ---
       const data = await res.json() as { response: string };
+      // Display the full backend response—AI answer or error!
       setMessages((msgs) => [...msgs, { text: data.response, sender: "ai" }]);
-    } catch {
+    } catch (err) {
       setMessages((msgs) => [
         ...msgs,
-        { text: "Error: Unable to reach AI backend.", sender: "ai" }
+        { text: `Client error: ${err instanceof Error ? err.message : String(err)}`, sender: "ai" }
       ]);
     }
   };
