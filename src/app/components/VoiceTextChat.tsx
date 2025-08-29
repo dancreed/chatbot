@@ -10,7 +10,7 @@ export default function VoiceTextChat() {
 
   const startListening = () => {
     const SpeechRecognitionClass =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionClass) {
       alert("Speech recognition not supported!");
       return;
