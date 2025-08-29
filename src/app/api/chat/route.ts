@@ -13,8 +13,7 @@ export async function POST(req: NextRequest) {
     body = await req.json() as { message?: string };
   } catch (err) {
     return Response.json({
-      response:
-        `Error parsing request body: ${err instanceof Error ? err.message : String(err)}`,
+      response: `Error parsing request body: ${err instanceof Error ? err.message : String(err)}`
     });
   }
 
@@ -28,40 +27,26 @@ export async function POST(req: NextRequest) {
         "Authorization": `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,
       },
       body: JSON.stringify({
-        messages: [{ role: "user", content: message }],
+        messages: [{ role: "user", content: message }]
       }),
     });
 
     const contentType = aiRes.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       const responsePayload = await aiRes.json() as Record<string, unknown>;
-      // Try preferred keys: result, response, choices, content
-      let text = "";
-      if (typeof responsePayload.result === "string") {
-        text = responsePayload.result;
-      } else if (typeof responsePayload.response === "string") {
-        text = responsePayload.response;
-      } else if (
-        Array.isArray(responsePayload.choices) &&
-        typeof responsePayload.choices[0]?.message?.content === "string"
-      ) {
-        text = responsePayload.choices[0].message.content;
-      } else if (typeof responsePayload.content === "string") {
-        text = responsePayload.content;
-      } else {
-        text = "(No AI response)";
-      }
-      return Response.json({ response: text });
+      // Log to server for debug
+      console.log("[AI ROUTE] Raw Cloudflare response:", JSON.stringify(responsePayload));
+      // Return full JSON for easy inspection in frontend
+      return Response.json({ response: JSON.stringify(responsePayload, null, 2) });
     } else {
-      // Always return valid JSON even on HTML/text error
       const errorText = await aiRes.text();
       return Response.json({
-        response: `AI error: ${aiRes.status} [Non-JSON]: ${errorText.slice(0, 300)}`,
+        response: `AI error: ${aiRes.status} [Non-JSON]: ${errorText.slice(0, 300)}`
       });
     }
   } catch (err) {
     return Response.json({
-      response: `AI fetch error: ${err instanceof Error ? err.message : String(err)}`,
+      response: `AI fetch error: ${err instanceof Error ? err.message : String(err)}`
     });
   }
 }
