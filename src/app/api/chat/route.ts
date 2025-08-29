@@ -31,23 +31,12 @@ export async function POST(req: NextRequest) {
     let responsePayload: Record<string, unknown> | string;
     if (contentType && contentType.includes('application/json')) {
       responsePayload = await aiRes.json() as Record<string, unknown>;
-      if (!aiRes.ok) {
-        return Response.json({ response: `AI error: ${aiRes.status} ${JSON.stringify(responsePayload).slice(0, 300)}` });
-      }
-      return Response.json({
-        response:
-          typeof responsePayload.result === "string"
-            ? responsePayload.result
-            : typeof responsePayload.response === "string"
-            ? responsePayload.response
-            : "(No AI response)",
-      });
+      console.log("[AI ROUTE] Full response from Cloudflare:", responsePayload);
+      // Return the whole payload for debugging!
+      return Response.json({ response: responsePayload });
     } else {
-      // Always return valid JSON even on HTML/text error
       const errorText = await aiRes.text();
-      return Response.json({
-        response: `AI error: ${aiRes.status} [Non-JSON]: ${errorText.slice(0, 300)}`,
-      });
+      return Response.json({ response: `AI error: ${aiRes.status} [Non-JSON]: ${errorText.slice(0, 300)}` });
     }
   } catch (err) {
     return Response.json({
