@@ -3,7 +3,6 @@ import { NextRequest } from "next/server";
 const AI_ENDPOINT = "https://api.cloudflare.com/client/v4/accounts/1443bf3700478d04e685484953259e23/ai/run/@cf/meta/llama-2-7b-chat-fp16";
 
 export async function POST(req: NextRequest) {
-  // Debug: log endpoint and token presence
   console.log("[AI ROUTE] Endpoint:", AI_ENDPOINT);
   console.log("[AI ROUTE] Token present?", !!process.env.CLOUDFLARE_API_TOKEN);
 
@@ -17,7 +16,7 @@ export async function POST(req: NextRequest) {
     body = await req.json() as { message?: string };
   } catch (err) {
     console.error("[AI ROUTE] Error parsing request body:", err);
-    return Response.json({ response: "Error parsing request body." });
+    return Response.json({ response: `Error parsing request body: ${err instanceof Error ? err.message : String(err)}` });
   }
   const message = body.message ?? "";
 
@@ -45,7 +44,7 @@ export async function POST(req: NextRequest) {
     const aiMessage = aiData.result ?? aiData.response ?? "(No AI response)";
     return Response.json({ response: aiMessage });
   } catch (err) {
-    // Enhanced error logging and returning to the UI
+    // Return full error string to the UI for diagnosis
     console.error("[AI Proxy Error]", err);
     return Response.json({
       response: `AI fetch error: ${err instanceof Error ? err.message : String(err)}`
