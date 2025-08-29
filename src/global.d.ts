@@ -1,6 +1,18 @@
 // src/global.d.ts
 
-// Minimal SpeechRecognition and Window interface for browser speech API
+// --- SpeechRecognition types ---
+interface SpeechRecognitionResultItem {
+  transcript: string;
+  confidence: number;
+}
+interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionResultItem;
+  length: number;
+}
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResult[];
+}
+
 interface SpeechRecognition extends EventTarget {
   lang: string;
   continuous: boolean;
