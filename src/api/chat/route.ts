@@ -1,21 +1,23 @@
 import { NextRequest } from "next/server";
 
-// Update these with your Cloudflare AI model and endpoint!
-const AI_ENDPOINT = "https://api.cloudflare.com/client/v4/accounts/1443bf3700478d04e685484953259e23/ai/run/@cf/meta/llama-2-7b-chat-fp16"; // Example endpoint
+// Cloudflare AI endpoint details
+const AI_ENDPOINT = "https://api.cloudflare.com/client/v4/accounts/YOUR_ACCOUNT_ID/ai/run/@cf/meta/llama-2-7b-chat-fp16";
 
 export async function POST(req: NextRequest) {
-  const { message } = await req.json();
+  // Safely assert the JSON type
+  const body = await req.json() as { message?: string };
+  const message = body.message ?? "";
 
   // Call Cloudflare Workers AI
   const aiRes = await fetch(AI_ENDPOINT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.CLOUDFLARE_API_TOKEN}` // set this in .env.local
+      "Authorization": `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`
     },
     body: JSON.stringify({
       prompt: message
-      // You may need 'messages: [...]' depending on your model; check documentation.
+      // You may need 'messages: [...]' for structured chat, reference model docs.
     }),
   });
 
@@ -24,7 +26,6 @@ export async function POST(req: NextRequest) {
   }
 
   const aiData = await aiRes.json();
-  // This assumes the Cloudflare AI response contains { result: string }
   const aiMessage = aiData.result || aiData.response || "(No AI response)";
   return Response.json({ response: aiMessage });
 }
