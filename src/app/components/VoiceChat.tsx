@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useRef } from "react";
 
-// Message type definition
 type ChatMessage = {
   text: string;
   sender: "user" | "ai" | "system";
@@ -9,19 +8,19 @@ type ChatMessage = {
 };
 
 export default function VoiceChat() {
-  const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [connected, setConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
+  // Connect to backend Durable Object WebSocket
   function connectWS() {
-    // Use your actual deployed Durable Object WebSocket endpoint:
-    wsRef.current = new WebSocket("wss://worker.dan-creed.workers.dev/websocket");
+    wsRef.current = new WebSocket("wss://your-worker-endpoint/websocket"); // <-- Replace with your endpoint!
     wsRef.current.onopen = () => {
       setConnected(true);
       setMessages((msgs) => [...msgs, { text: "Connected!", sender: "system" }]);
     };
-    wsRef.current.onmessage = (evt) => {
+    wsRef.current.onmessage = async (evt) => {
       const msg = JSON.parse(evt.data);
       if (msg.type === "text") {
         setMessages((msgs) => [...msgs, { text: msg.text, sender: "user" }]);
@@ -49,13 +48,28 @@ export default function VoiceChat() {
     audio.play();
   }
 
-  // Example: send user text instead of audio for demo
-  function handleSend() {
-    if (!input.trim() || !connected || !wsRef.current) return;
-    setMessages((msgs) => [...msgs, { text: input, sender: "user" }]);
-    // Simulate sending text; for voice, you would stream ArrayBuffer of mic audio here
-    wsRef.current.send(input);
-    setInput("");
+  // Microphone recording and sending audio chunks to backend WS
+  async function startRecording() {
+    if (!connected || !wsRef.current) return;
+    if (!navigator.mediaDevices?.getUserMedia) {
+      alert("Microphone not supported in this browser!");
+      return;
+    }
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+    mediaRecorderRef.current = mediaRecorder;
+    mediaRecorder.ondataavailable = async (e) => {
+      if (e.data && wsRef.current?.readyState === WebSocket.OPEN) {
+        const buffer = await e.data.arrayBuffer();
+        wsRef.current.send(buffer);
+      }
+    };
+    mediaRecorder.start(500); // Send every 500ms (tweak as desired)
+  }
+
+  function stopRecording() {
+    mediaRecorderRef.current?.stop();
+    mediaRecorderRef.current = null;
   }
 
   return (
@@ -78,6 +92,42 @@ export default function VoiceChat() {
       >
         {connected ? "Connected!" : "Connect"}
       </button>
+      <button
+        onClick={startRecording}
+        disabled={!connected || !!mediaRecorderRef.current}
+        style={{
+          marginBottom: "12px",
+          marginLeft: "8px",
+          padding: "10px 24px",
+          fontSize: "18px",
+          borderRadius: "8px",
+          background: "orange",
+          color: "#222",
+          fontWeight: "bold",
+          border: "none",
+          cursor: !connected || !!mediaRecorderRef.current ? "default" : "pointer",
+        }}
+      >
+        🎤 Start Recording
+      </button>
+      <button
+        onClick={stopRecording}
+        disabled={!mediaRecorderRef.current}
+        style={{
+          marginBottom: "12px",
+          marginLeft: "8px",
+          padding: "10px 24px",
+          fontSize: "18px",
+          borderRadius: "8px",
+          background: "red",
+          color: "#fff",
+          fontWeight: "bold",
+          border: "none",
+          cursor: !mediaRecorderRef.current ? "default" : "pointer",
+        }}
+      >
+        ⏹ Stop
+      </button>
       <div style={{ marginBottom: "24px" }}>
         {messages.map((msg, idx) => (
           <div key={idx} style={{
@@ -89,21 +139,6 @@ export default function VoiceChat() {
           </div>
         ))}
       </div>
-      <div style={{
-        position: "fixed",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: "#333",
-        padding: "24px",
-        borderTop: "3px solid #666",
-        display: "flex",
-        justifyContent: "center",
-        gap: "12px",
-        zIndex: 9999,
-      }}>
-        <input
-          type="text"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="Type your message (replace with audio stream for voice
+    </div>
+  );
+}
