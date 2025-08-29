@@ -28,17 +28,30 @@ export default function VoiceTextChat() {
     recognitionRef.current = recognition;
   };
 
-  const handleSend = (txt?: string) => {
+  // --- Updated handleSend: makes request to AI backend and shows AI reply ---
+  const handleSend = async (txt?: string) => {
     const message = txt ?? input;
     if (!message.trim()) return;
+
     setMessages((msgs) => [...msgs, { text: message, sender: "user" }]);
     setInput("");
-    setTimeout(() => {
+
+    try {
+      // Call your Next.js API backend (which calls Cloudflare AI)
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+
+      const data = await res.json();
+      setMessages((msgs) => [...msgs, { text: data.response, sender: "ai" }]);
+    } catch (err) {
       setMessages((msgs) => [
         ...msgs,
-        { text: `AI: ${message}`, sender: "ai" }
+        { text: "Error: Unable to reach AI backend.", sender: "ai" }
       ]);
-    }, 800);
+    }
   };
 
   return (
