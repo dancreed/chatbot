@@ -43,11 +43,11 @@ export default function VoiceTextChat() {
         body: JSON.stringify({ message }),
       });
 
-      const data = await res.json() as { response: unknown };
+      const data = await res.json() as { message: unknown };
       const messageText =
-        typeof data.response === "string"
-          ? data.response
-          : JSON.stringify(data.response);
+        typeof data.message === "string"
+          ? data.message
+          : JSON.stringify(data.message);
 
       setMessages((msgs) => [...msgs, { text: messageText, sender: "ai" }]);
     } catch (err) {
