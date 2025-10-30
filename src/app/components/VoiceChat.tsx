@@ -2,7 +2,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { clientConfig } from "@/config";
 import { ChatMessage, ConnectionStatus, VoiceChatState, createMessage } from "@/types";
-import ErrorDisplay, { LoadingIndicator, StatusIndicator } from "./UIComponents";
 
 export default function VoiceChat() {
   const [state, setState] = useState<VoiceChatState>({
@@ -29,42 +28,43 @@ export default function VoiceChat() {
       if (mediaRecorderRef.current) {
         mediaRecorderRef.current.stop();
         const tracks = mediaRecorderRef.current.stream?.getTracks();
-        tracks?.forEach((track: any) => track.stop());
+        tracks?.forEach((track: MediaStreamTrack) => track.stop());
       }
       
       // Clean up audio URLs
-      audioUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+      const urlsToClean = audioUrlsRef.current;
+      urlsToClean.forEach((url: string) => URL.revokeObjectURL(url));
     };
   }, []);
 
   const addMessage = useCallback((text: string, sender: ChatMessage['sender'], audioB64?: string) => {
     const message = createMessage(text, sender, audioB64);
-    setState(prev => ({
+    setState((prev: VoiceChatState) => ({
       ...prev,
       messages: [...prev.messages, message]
     }));
   }, []);
 
   const setStatus = useCallback((status: ConnectionStatus) => {
-    setState(prev => ({ ...prev, status }));
+    setState((prev: VoiceChatState) => ({ ...prev, status }));
   }, []);
 
   const setError = useCallback((error: string | null) => {
-    setState(prev => ({ ...prev, error }));
+    setState((prev: VoiceChatState) => ({ ...prev, error }));
   }, []);
 
   // Connect to backend Durable Object WebSocket
   function connectWS() {
-    setState(prev => ({ ...prev, status: 'connecting', error: null }));
+    setState((prev: VoiceChatState) => ({ ...prev, status: 'connecting', error: null }));
     
     wsRef.current = new WebSocket(clientConfig.websocket.url);
     
     wsRef.current.onopen = () => {
-      setState(prev => ({ ...prev, connected: true, status: 'connected' }));
+      setState((prev: VoiceChatState) => ({ ...prev, connected: true, status: 'connected' }));
       addMessage("Connected!", "system");
     };
     
-    wsRef.current.onmessage = async (evt) => {
+    wsRef.current.onmessage = async (evt: MessageEvent) => {
       try {
         const msg = JSON.parse(evt.data);
         if (msg.type === "text") {
@@ -83,11 +83,11 @@ export default function VoiceChat() {
     
     wsRef.current.onerror = () => {
       setError("WebSocket connection error");
-      setState(prev => ({ ...prev, status: 'error' }));
+      setState((prev: VoiceChatState) => ({ ...prev, status: 'error' }));
     };
     
     wsRef.current.onclose = () => {
-      setState(prev => ({ ...prev, connected: false, status: 'idle' }));
+      setState((prev: VoiceChatState) => ({ ...prev, connected: false, status: 'idle' }));
       addMessage("Connection closed.", "system");
     };
   }
@@ -133,7 +133,7 @@ export default function VoiceChat() {
     }
     
     try {
-      setState(prev => ({ ...prev, isRecording: true, status: 'recording', error: null }));
+      setState((prev: VoiceChatState) => ({ ...prev, isRecording: true, status: 'recording', error: null }));
       
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
@@ -148,13 +148,13 @@ export default function VoiceChat() {
       
       mediaRecorder.onerror = () => {
         setError("Recording error occurred");
-        stopRecording();
+        setState((prev: VoiceChatState) => ({ ...prev, isRecording: false, status: 'connected' }));
       };
       
       mediaRecorder.start(500); // Send every 500ms
     } catch (error) {
       setError(`Failed to start recording: ${error}`);
-      setState(prev => ({ ...prev, isRecording: false, status: 'connected' }));
+      setState((prev: VoiceChatState) => ({ ...prev, isRecording: false, status: 'connected' }));
     }
   }, [state.connected, setError]);
 
@@ -164,11 +164,11 @@ export default function VoiceChat() {
       
       // Clean up the media stream
       const tracks = mediaRecorderRef.current.stream?.getTracks();
-      tracks?.forEach(track => track.stop());
+      tracks?.forEach((track: MediaStreamTrack) => track.stop());
       
       mediaRecorderRef.current = null;
     }
-    setState(prev => ({ ...prev, isRecording: false, status: 'connected' }));
+    setState((prev: VoiceChatState) => ({ ...prev, isRecording: false, status: 'connected' }));
   }, []);
 
   return (

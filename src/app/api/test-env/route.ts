@@ -1,8 +1,12 @@
 // src/app/api/test-env/route.ts
 
-import { NextRequest } from "next/server";
+declare const process: {
+  env: {
+    [key: string]: string | undefined;
+  };
+};
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   // Test presence and mask actual token
   return Response.json({
     token: !!process.env.CLOUDFLARE_API_TOKEN ? "present" : "missing"
