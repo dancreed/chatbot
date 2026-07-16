@@ -17,7 +17,7 @@ export const clientConfig = {
 // Server-side config (all env variables available)
 export const serverConfig = {
   ai: {
-    endpoint: process.env.CLOUDFLARE_AI_ENDPOINT || "https://api.cloudflare.com/client/v4/accounts/1443bf3700478d04e685484953259e23/ai/run/@cf/meta/llama-2-7b-chat-fp16",
+    endpoint: process.env.CLOUDFLARE_AI_ENDPOINT || "https://api.cloudflare.com/client/v4/accounts/1443bf3700478d04e685484953259e23/ai/run/@cf/google/gemma-4-26b-a4b-it",
     token: process.env.CLOUDFLARE_API_TOKEN
   }
 } as const;
